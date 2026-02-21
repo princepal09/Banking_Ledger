@@ -1,5 +1,6 @@
 const User = require("../models/user.model");
 const jwt = require("jsonwebtoken");
+const { sendRegistrationEmail } = require("../services/email.service");
 
 /**
  * - user register controller
@@ -45,12 +46,15 @@ exports.userRegisterController = async (req, res) => {
       expires: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000),
       httpOnly: true,
     };
+        
+    sendRegistrationEmail(user.email, user.name);
 
     return res.cookie("authCookie", token, options).status(201).json({
-      success: true, 
+      success: true,
       message: "Account Register Successfully",
       token: token,
     });
+
   } catch (err) {
     console.error(err.message);
     return res.status(500).json({
@@ -76,7 +80,7 @@ exports.loginController = async (req, res) => {
       });
     }
 
-    const user = await User.findOne({email}).select("+password")
+    const user = await User.findOne({ email }).select("+password");
 
     if (!user) {
       return res.status(401).json({
@@ -106,16 +110,19 @@ exports.loginController = async (req, res) => {
       httpOnly: true,
     };
 
-    return res.cookie("authCookie", token, options).status(200).json({
-      success: true,
-      message: "Login Successfully",
-      user : {
-        _id : user._id,
-        email : user.email,
-        name : user.name
-      },
-      token: token
-    });
+    return res
+      .cookie("authCookie", token, options)
+      .status(200)
+      .json({
+        success: true,
+        message: "Login Successfully",
+        user: {
+          _id: user._id,
+          email: user.email,
+          name: user.name,
+        },
+        token: token,
+      });
   } catch (err) {
     console.error(err.message);
     return res.status(500).json({

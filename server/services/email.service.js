@@ -22,13 +22,13 @@ transporter.verify((error, success) =>{
     }
 } )
 
-exports.sendEmail = async(to, subject, text, html) =>{
+const sendEmail = async(to, subject, text, html) =>{
     try{
         const info = await transporter.sendMail({
             from : `"Backend Ledger" <${process.env.EMAIL_USER}>`,
             to,
             subject,
-            list,
+            text,
             html
         })
 

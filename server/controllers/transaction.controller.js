@@ -1,0 +1,76 @@
+const Transaction = require("../models/transaction.model");
+const Ledger = require("../models/transaction.model");
+const Account = require("../models/account.model");
+
+exports.createTransaction = async (req, res) => {
+  /**
+   * 1. Validate Request
+   */
+
+  const { fromAccount, toAccount, amount, idempotencyKey } = req.body;
+  if (!fromAccount || !toAccount || !amount || !idempotencyKey) {
+    return res.status(400).json({
+      status: false,
+      message: "all fields are mandatory !!",
+    });
+  }
+
+  const fromUserAccount = await Account.findOne({ _id: toAccount });
+  const toUserAccount = await Account.findOne({ _id: toAccount });
+
+  if (!fromUserAccount || !toUserAccount) {
+    return res.status(400).json({
+      status: false,
+      message: "Invalid fromAccount or toAccount",
+    });
+  }
+
+  /**
+   * 2. Validate Idempotency Key
+   */
+
+  const isTransactionAlreadyExists = await Transaction.findOne({
+    idempotencyKey: idempotencyKey,
+  });
+
+  if (isTransactionAlreadyExists) {
+    if (isTransactionAlreadyExists.status == "COMPLETED") {
+      return res.status(200).json({
+        message: "Transaction already proceesed",
+      });
+    }
+    if (isTransactionAlreadyExists.status == "PENDING") {
+      return res.status(200).json({
+        message: "MESSAGE transaction  is still in Processing",
+      });
+    }
+    if (isTransactionAlreadyExists.status == "FAILED") {
+      return res.status(500).json({
+        success: false,
+        message: "Transaction processing failed",
+      });
+    }
+    if (isTransactionAlreadyExists.status == "REVERSED") {
+      return res.status(500).json({
+        success: false,
+        message: "Transaction was reversed, Please retry ",
+      });
+    }
+  }
+
+  /**
+   * 3. Check Amount Status
+   */
+
+  if(fromUserAccount.status !== 'ACTIVE' || toUserAccount.status !== "ACTIVE"){
+    return res.status(400).json({
+        success : false,
+        message : "Both fromAccount and toUserAccount must be ACTIVE to process transaction"
+
+    })
+  }
+
+  /**
+   * 4. Derive sender balance from ledger
+   */
+};

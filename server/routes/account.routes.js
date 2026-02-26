@@ -1,7 +1,7 @@
 const express = require("express")
 const {auth} = require("../middleware/auth.middleware")
 const router = express.Router();
-const accountContoller = require("../controllers")
+const {accountController} = require("../controllers/account.controller")
 
 
 /**
@@ -10,7 +10,7 @@ const accountContoller = require("../controllers")
  *  - Protected Route
  */
 
-  router.post("/", auth, );
+  router.post("/", auth, accountController);
 
 
 

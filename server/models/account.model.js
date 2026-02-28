@@ -63,7 +63,13 @@ accountSchema.methods.getBalance = async function(){
 
   ])
 
-  
+  if(balanceData.length === 0){
+    return 0
+  }
+
+  return balanceData[0].balance
+
+
 
 
 }

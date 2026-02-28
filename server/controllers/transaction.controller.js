@@ -82,4 +82,8 @@ exports.createTransaction = async (req, res) => {
       message : `Insufficient balance. Current balance is ${balance}, Requested amount is ${amount}`
     })
   }
+
+  /**
+   * 5. Create Transaction (PENDING)
+   */
 };

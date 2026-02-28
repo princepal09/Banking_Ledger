@@ -37,6 +37,7 @@ exports.createTransaction = async (req, res) => {
     if (isTransactionAlreadyExists.status == "COMPLETED") {
       return res.status(200).json({
         message: "Transaction already proceesed",
+        transaction : isTransactionAlreadyExists
       });
     }
     if (isTransactionAlreadyExists.status == "PENDING") {
@@ -73,4 +74,6 @@ exports.createTransaction = async (req, res) => {
   /**
    * 4. Derive sender balance from ledger
    */
+
+  const balance =  await fromUserAccount.getBalance()
 };

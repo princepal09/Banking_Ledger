@@ -59,7 +59,7 @@ exports.createTransaction = async (req, res) => {
   }
 
   /**
-   * 3. Check Amount Status
+   * 3. Check Account Status
    */
 
   if(fromUserAccount.status !== 'ACTIVE' || toUserAccount.status !== "ACTIVE"){

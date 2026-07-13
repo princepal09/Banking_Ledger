@@ -1,5 +1,6 @@
 const Transaction = require("../models/transaction.model");
-const Ledger = require("../models/transaction.model");
+const Ledger = require("../models/ledger.model");
+const User = require("../models/user.model");
 const Account = require("../models/account.model");
 const mongoose = require('mongoose')
 const emailService = require("../services/email.service.js")
@@ -156,12 +157,13 @@ exports.createInitialFundsTransaction = async (req, res) => {
 
   try {
 
-    const { toAccount, fromAccount, idempotencyKey } = req.body;
+    const { toAccount, amount, idempotencyKey } = req.body;
 
-    if (!toAccount || !fromAccount || !idempotencyKey) {
+
+    if (!toAccount || !amount || !idempotencyKey) {
       return res.status(400).json({
         success: false,
-        message: "toAccount, fromAccount and idempotencyKey are mandatory"
+        message: "toAccount, amount and idempotencyKey are mandatory"
       })
     }
     const toUserAccount = await Account.findOne({ _id: toAccount });
@@ -173,7 +175,6 @@ exports.createInitialFundsTransaction = async (req, res) => {
     }
 
     const fromUserAccount = await Account.findOne({
-      systemUser: true,
       user: req.user._id
     })
 
@@ -187,27 +188,29 @@ exports.createInitialFundsTransaction = async (req, res) => {
     const session = await mongoose.startSession();
     session.startTransaction();
 
-    const transaction = await Transaction.create({
+    const transaction = new Transaction({
       fromAccount: fromUserAccount._id,
-      toAccount: toUserAccount._id,
+      toAccount,
       amount,
       idempotencyKey,
       status: "PENDING"
-    }, { session })
+    })
 
-    const debitLedgerEntry = await Ledger.create({
+    console.log(transaction.toObject());
+
+    const debitLedgerEntry = await Ledger.create([{
       account: fromUserAccount._id,
       amount,
       transaction: transaction._id,
       type: "DEBIT"
-    }, { session })
+    }], { session })
 
-    const creditLedgerEntry = await Ledger.create({
-      account: toUserAccount._id,
+    const creditLedgerEntry = await Ledger.create([{
+      account: toAccount,
       amount,
       transaction: transaction._id,
       type: "CREDIT"
-    }, { session })
+    }], { session })
 
 
     transaction.status = "COMPLETED"
@@ -225,6 +228,8 @@ exports.createInitialFundsTransaction = async (req, res) => {
     })
 
   } catch (err) {
+    console.error(err);
+    console.error(err.stack);
     return res.status(500).json({
       success: false,
       message: "Error processing initial funds transaction",

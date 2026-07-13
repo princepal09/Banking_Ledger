@@ -11,8 +11,8 @@ const {createAccountController, getUserAccountsController, getAccountBalanceCont
  */
 
   router.post("/create", auth, createAccountController);
-  router.post("/getUserAccounts", auth, getUserAccountsController);
-  router.post("/getAccountBalance/:accountId", auth, getAccountBalanceController);
+  router.get("/getUserAccounts", auth, getUserAccountsController);
+  router.get("/getAccountBalance/:accountId", auth, getAccountBalanceController);
 
   
 

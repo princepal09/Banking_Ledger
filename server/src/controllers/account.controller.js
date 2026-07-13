@@ -57,10 +57,11 @@ exports.getUserAccountsController = async(req, res) =>{
 
 exports.getAccountBalanceController = async(req, res) =>{
     try{
-        const userID = req.user.id;
+        const userId = req.user.id;
         const {accountId} = req.params;
+        console.log("Fetching balance for accountId:", accountId, "and userId:", userId);
 
-        const account = await Account.findOne({_id : accountId, user : userID})
+        const account = await Account.findOne({_id : accountId, user : userId})
         if(!account){
             return res.status(404).json({
                 success : false,

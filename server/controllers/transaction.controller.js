@@ -3,6 +3,7 @@ const Ledger = require("../models/transaction.model");
 const Account = require("../models/account.model");
 const mongoose = require('mongoose')
 const emailService = reqiure("../services/email.service.js")
+
 exports.createTransaction = async (req, res) => {
   /**
    * 1. Validate Request
@@ -13,7 +14,7 @@ exports.createTransaction = async (req, res) => {
     return res.status(400).json({
       status: false,
       message: "all fields are mandatory !!",
-    });
+    }); 
   }
 
   const fromUserAccount = await Account.findOne({ _id: toAccount });
@@ -99,6 +100,9 @@ exports.createTransaction = async (req, res) => {
 
   }, {session})
 
+   /**
+   * 6. Create Transaction (PENDING)
+   */
    const debitLedgerEntry = await ledgerModel.create({
     account : toAccount,
     amount : amount,
@@ -108,6 +112,9 @@ exports.createTransaction = async (req, res) => {
 
   }, {session})
 
+  /**
+   * 7. Create Transaction (PENDING)
+   */
   const creditLedgerEntry = await ledgerModel.create({
     account : toAccount,
     amount : amount,
@@ -117,9 +124,15 @@ exports.createTransaction = async (req, res) => {
 
   }, {session})
 
+  /**
+   * 8. Create Transaction (PENDING)
+   */
   transaction.status = "COMPLETED"
   await transaction.save({session})
 
+  /**
+   * 9. Create Transaction (PENDING)
+   */
   await session.commitTransaction();
   session.endSession();
 

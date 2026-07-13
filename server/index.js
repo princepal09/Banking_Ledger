@@ -6,15 +6,16 @@ const { dbConnect } = require("./config/database");
 const authRoutes = require("./routes/auth.routes")
 const cookieParser = require("cookie-parser")
 const accountRoutes = require("./routes/account.routes")
+const transactionRoutes = require("./routes/transaction.routes")
 
 // Middleware  
 app.use(express.json());
 app.use(cookieParser())
 
 //Routes
-app.use("/api/v1", authRoutes);
-app.use("/api/v1", accountRoutes)
-
+app.use("/api/v1/auth", authRoutes)
+app.use("/api/v1/account", accountRoutes)
+app.use("/api/v1/transaction", transactionRoutes)
 
 // Db Connection + Server Start 
 dbConnect()

@@ -54,12 +54,15 @@ exports.sendTransactionEmail = async (userEmail, name, amount, toAccount) => {
     const subject = 'Transaction Alert from Backend - Ledger'
     const text = `Hello ${name}, A transaction of amount ${amount} has been made to account ${toAccount}. If you have any questions or need assistance, feel free to reach out to our support team. Best regards, The Backend - Ledger Team`
     const html = `<p>Hello ${name},</p><p>A transaction of amount <strong>${amount}</strong> has been made to account <strong>${toAccount}</strong>. If you have any questions or need assistance, feel free to reach out to our support team.</p><p>Best regards,<br>The Backend - Ledger Team</p>`;
+    await sendEmail(userEmail, subject, text, html);
+
 }
 
 exports.sendTransactionFailureEmail = async (userEmail, name, amount, toAccount) => {
     const subject = 'Transaction Failure Alert from Backend - Ledger'
     const text = `Hello ${name}, A transaction of amount ${amount} to account ${toAccount} has failed. If you have any questions or need assistance, feel free to reach out to our support team. Best regards, The Backend - Ledger Team`
     const html = `<p>Hello ${name},</p><p>A transaction of amount <strong>${amount}</strong> to account <strong>${toAccount}</strong> has failed. If you have any questions or need assistance, feel free to reach out to our support team.</p><p>Best regards,<br>The Backend - Ledger Team</p>`;
+    await sendEmail(userEmail, subject, text, html);
 }
 
 

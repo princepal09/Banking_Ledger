@@ -3,6 +3,8 @@ const jwt = require("jsonwebtoken");
 const dotenv = require("dotenv");
 dotenv.config();
 
+const TokenBlackList = require("../models/blackList.model");
+
 exports.auth = async (req, res, next) => {
   try {
     const token = req.cookies.authCookie || req.headers.authorization?.split(" ")[1];
@@ -11,6 +13,14 @@ exports.auth = async (req, res, next) => {
       return res.status(401).json({
         succcess: false,
         message: "Token Missing !!!",
+      });
+    }
+
+    const isBlacklisted = await TokenBlackList.findOne({ token });
+    if (isBlacklisted) {
+      return res.status(401).json({
+        success: false,
+        message: "Token is blacklisted, please login again",
       });
     }
 
@@ -35,7 +45,7 @@ exports.auth = async (req, res, next) => {
   }
 };
 
-exports.authSystemUserMiddleware = async(req, res, next) => {
+exports.authSystemUserMiddleware = async (req, res, next) => {
   try {
     const token = req.cookies.authCookie || req.headers.authorization?.split(" ")[1];
     if (!token) {
@@ -45,12 +55,22 @@ exports.authSystemUserMiddleware = async(req, res, next) => {
       });
     }
 
+    const isBlacklisted = await TokenBlackList.findOne({ token });
+    if (isBlacklisted) {
+      return res.status(401).json({
+        success: false,
+        message: "Token is blacklisted, please login again",
+      });
+    }
+
+
+
 
     // Verify the token
     try {
       const decoded = jwt.verify(token, process.env.JWT_SECRET);
       const user = await User.findById(decoded.id).select("+systemUser")
-      
+
       if (!user.systemUser) {
         return res.status(403).json({
           success: false,

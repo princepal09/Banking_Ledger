@@ -6,6 +6,9 @@ const router = express.Router();
 /*  POST /api/v1/auth/register */
 router.post("/register", userRegisterController);
 
+
+router.post("/logout", auth, logoutController)
+
 /*  POST /api/v1/auth/login  */
 router.post("/login", loginController)
 

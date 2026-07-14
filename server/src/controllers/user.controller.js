@@ -2,6 +2,7 @@ const User = require("../models/user.model");
 const jwt = require("jsonwebtoken");
 const { sendRegistrationEmail } = require("../services/email.service");
 const dotenv = require("dotenv");
+const TokenBlackList = require("../models/blackList.model");
 dotenv.config();
 
 /**
@@ -48,7 +49,7 @@ exports.userRegisterController = async (req, res) => {
       expires: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000),
       httpOnly: true,
     };
-        
+
     sendRegistrationEmail(user.email, user.name);
 
     return res.cookie("authCookie", token, options).status(201).json({
@@ -133,3 +134,27 @@ exports.loginController = async (req, res) => {
     });
   }
 };
+
+
+exports.logoutController = async (req, res) => {
+  try {
+
+    const token = req.cookies.authCookie || req.headers.authorization?.split(" ")[1];
+    if (!token) {
+      return res.status(400).json({
+        success: false,
+        message: "User Logged Out Already",
+      });
+    }
+    res.clearCookie("authCookie");
+
+    await TokenBlackList.create({ token });
+
+  } catch (err) {
+    console.error(err.message);
+    return res.status(500).json({
+      success: false,
+      message: "Something Went Wrong while logging out",
+    });
+  }
+}

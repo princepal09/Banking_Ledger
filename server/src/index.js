@@ -1,7 +1,7 @@
 const express = require("express");
 const app = express();
 require("dotenv").config();
-const PORT = process.env.PORT;
+const PORT = process.env.PORT || 4000;
 const { dbConnect } = require("./config/database");
 const authRoutes = require("./routes/auth.routes")
 const cookieParser = require("cookie-parser")
@@ -18,6 +18,15 @@ app.use("/api/v1/account", accountRoutes)
 app.use("/api/v1/transaction", transactionRoutes)
 
 // Db Connection + Server Start 
+
+app.get("/", (req, res) => {
+  res.status(200).json({
+    status: "true",
+    message: "Your server is up and running successfully",
+  })
+})
+
+
 dbConnect()
   .then(() => {
     app.listen(PORT, () => {
@@ -28,4 +37,3 @@ dbConnect()
     console.error("Database connection failed:", err);
   });
 
-  
